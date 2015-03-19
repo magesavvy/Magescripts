@@ -1,0 +1,4 @@
+SELECT `main_table`.*, `eav/attribute_option_value`.`value`, `eav/attribute_option_value`.`store_id`
+FROM `eav_attribute_option` AS `main_table` 
+INNER JOIN `eav_attribute_option_value` AS `eav/attribute_option_value` ON `eav/attribute_option_value`.option_id=`main_table`.option_id 
+WHERE  attribute_id = (SELECT attribute_id FROM eav_attribute where attribute_code='size') AND (store_id = '0') ORDER BY `option_id` ASC

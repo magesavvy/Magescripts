@@ -1,0 +1,222 @@
+===============
+#All customer addres
+
+DELIMITER $$
+
+USE `lightingsupply_23102013`$$
+
+DROP PROCEDURE IF EXISTS `getcustadd`$$
+
+CREATE
+    /*[DEFINER = { user | CURRENT_USER }]*/
+    PROCEDURE `lightingsupply_23102013`.`getcustadd`()
+    /*LANGUAGE SQL
+    | [NOT] DETERMINISTIC
+    | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }
+    | SQL SECURITY { DEFINER | INVOKER }
+    | COMMENT 'string'*/
+    BEGIN
+    DECLARE $custid VARCHAR(1500);
+    DECLARE $custaddid VARCHAR(1500);
+    DECLARE $Fname  VARCHAR(1500);
+    DECLARE $Lname  VARCHAR(1500);
+    DECLARE $street  VARCHAR(5000);
+    DECLARE $gpid  VARCHAR(1500);
+    DECLARE $zip VARCHAR(1500);
+    DECLARE $city VARCHAR(1500);
+    DECLARE $state INTEGER;
+    DECLARE $country  VARCHAR(1500);
+    DECLARE $defaultship VARCHAR(10);
+    DECLARE $defaultbill VARCHAR(10);
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE curcust CURSOR FOR 
+    SELECT entity_id FROM customer_address_entity WHERE entity_id<9483;#$custaddid;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    SET $custid = 0;
+    SET $custaddid = 0;
+    SET $Fname='';
+    SET $Lname='';
+    SET $street='';
+    SET $gpid='';
+    SET $zip='';
+    SET $city='';
+    SET $state='';
+    SET $country='';
+    SET $defaultship ='N';
+    SET $defaultbill ='N';
+#SELECT entity_id FROM customer_entity
+
+DROP TEMPORARY TABLE IF EXISTS temp_ByCustomer;
+                    CREATE TEMPORARY TABLE temp_ByCustomer (
+                                  customeradd_id  VARCHAR(1500),
+                                  Fname  VARCHAR(1500),
+                                  Lname VARCHAR(1500),
+                                  street VARCHAR(3000),
+                                  gpid VARCHAR(50),
+                                  zip VARCHAR(50),
+                                  city VARCHAR(500),
+                                  state VARCHAR(50),
+                                  country VARCHAR(50),
+                                  defaultship VARCHAR(10),
+                                  defaultbill VARCHAR(10)
+                    ) ENGINE=MYISAM;
+
+OPEN curcust;
+
+custaddesloop: LOOP
+SET done = FALSE ;
+    FETCH curcust INTO $custaddid;
+    IF done THEN
+      LEAVE custaddesloop;
+    END IF;
+
+                SET $Fname= (SELECT `value` FROM  customer_address_entity_varchar  WHERE entity_id=$custaddid AND attribute_id=19);
+                SET $Lname= (SELECT `value` FROM  customer_address_entity_varchar  WHERE entity_id=$custaddid AND attribute_id=21);
+                SET $street = (SELECT `value` FROM `customer_address_entity_text` WHERE entity_id=$custaddid AND attribute_id=24);
+                SET $gpid= (SELECT `value`  FROM  customer_address_entity_varchar  WHERE entity_id=$custaddid AND attribute_id=361);
+                SET $city= (SELECT `value`  FROM  customer_address_entity_varchar  WHERE entity_id=$custaddid AND attribute_id=25);
+                SET $state= (SELECT `value`  FROM  customer_address_entity_int WHERE entity_id=$custaddid AND attribute_id=28);
+                SET $zip= (SELECT `value`  FROM  customer_address_entity_varchar  WHERE entity_id=$custaddid AND attribute_id=29);
+                SET $country= (SELECT `value` FROM  customer_address_entity_varchar  WHERE entity_id=$custaddid AND attribute_id=26);
+SET $defaultship =(   SELECT CASE WHEN ci.`value` = $custaddid THEN 'Y' ELSE 'N' END AS defaultship
+FROM customer_entity_int ci,customer_address_entity cd, customer_entity cs 
+ WHERE  cs.entity_id=cd.parent_id AND ci.`entity_id`=cs.`entity_id` AND
+ci.attribute_id=13 AND cd.entity_id=$custaddid );#default_billing
+SET $defaultbill = (  SELECT CASE WHEN ci.`value` = $custaddid THEN 'Y' ELSE 'N' END AS defaultship
+FROM customer_entity_int ci,customer_address_entity cd, customer_entity cs 
+ WHERE  cs.entity_id=cd.parent_id AND ci.`entity_id`=cs.`entity_id` AND
+ci.attribute_id=14 AND cd.entity_id=$custaddid );#default_billing
+                
+                
+                INSERT INTO 
+                temp_ByCustomer  (SELECT    $custaddid , $Fname,    $Lname,    $street,    $gpid,    $zip,
+                    $city,    $state,    $country, $defaultship,  $defaultbill);
+                
+
+  END LOOP;
+CLOSE curcust;
+
+SELECT * FROM temp_ByCustomer;
+
+
+END$$
+
+
+DELIMITER ;
+
+
+=========================
+
+All customers
+
+DELIMITER $$
+
+USE `lightingsupply_23102013`$$
+
+DROP PROCEDURE IF EXISTS `getallcust`$$
+
+CREATE
+    /*[DEFINER = { user | CURRENT_USER }]*/
+    PROCEDURE `lightingsupply_23102013`.`getallcust`()
+    /*LANGUAGE SQL
+    | [NOT] DETERMINISTIC
+    | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }
+    | SQL SECURITY { DEFINER | INVOKER }
+    | COMMENT 'string'*/
+    BEGIN
+                DECLARE $custid VARCHAR(1500);
+                DECLARE $Fname  VARCHAR(1500);
+                DECLARE $Lname  VARCHAR(1500);
+                DECLARE $gpid  VARCHAR(1500);
+                DECLARE $email VARCHAR(1500);
+                DECLARE $grp  VARCHAR(1500);
+                DECLARE $salesperson  VARCHAR(1500);
+                DECLARE $lsc_business_type  VARCHAR(1500);
+                DECLARE $lsc_aaa_customer  VARCHAR(1500);
+                DECLARE $lsc_po_status  VARCHAR(1500);
+                DECLARE $lsc_po_number  VARCHAR(1500);
+                DECLARE $lsc_on_hold  VARCHAR(1500);
+                DECLARE $price_level  VARCHAR(1500);
+                DECLARE done INT DEFAULT FALSE;
+    DECLARE curcust CURSOR FOR 
+     SELECT entity_id FROM customer_entity;# WHERE entity_id=9482;#$custaddid;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+                SET $custid = '';
+                SET $Fname='';
+                SET $Lname='';
+                SET $email='';
+                SET $grp='';
+                SET $salesperson='';
+                SET $lsc_business_type='';
+                SET $lsc_aaa_customer='';
+                SET $lsc_po_status='';
+                SET $lsc_po_number='';
+                SET $lsc_on_hold='';
+                SET $price_level='';
+
+#SELECT entity_id FROM customer_entity
+
+
+
+DROP TEMPORARY TABLE IF EXISTS temp_ByCustomer;
+                    CREATE TEMPORARY TABLE temp_ByCustomer (
+                                  customeradd_id  VARCHAR(1500),
+                                  Fname  VARCHAR(1500),
+                                  Lname VARCHAR(1500),
+                                  email VARCHAR(1500),
+                                  grp VARCHAR(150),
+                                  gpid VARCHAR(50),
+                                  salesperson VARCHAR(150),
+                                  lsc_business_type VARCHAR(500),
+                                  lsc_aaa_customer VARCHAR(150),
+                                  lsc_po_status VARCHAR(50),
+                                  lsc_po_number VARCHAR(150),
+                                  lsc_on_hold VARCHAR(150),
+                                  price_level VARCHAR(150)
+                    ) ENGINE=MYISAM;
+
+OPEN curcust;
+
+custaddesloop: LOOP
+SET done = FALSE ;
+    FETCH curcust INTO $custid;
+    IF done THEN
+      LEAVE custaddesloop;
+    END IF;
+
+                                                
+                                                
+                                SET $Fname= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=5 AND entity_id=$custid);#fname
+                                SET $Lname= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=7 AND entity_id=$custid); #lname
+                                SET $email= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=9 AND entity_id=$custid); #email
+                                SET $grp= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=10 AND entity_id=$custid); #group
+                                SET $gpid= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=362 AND entity_id=$custid); #target_customer_id
+                                SET $salesperson= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=365 AND entity_id=$custid); #salesperson
+                                SET $lsc_business_type= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=229 AND entity_id=$custid); #lsc_business_type
+                                SET $lsc_aaa_customer= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=332 AND entity_id=$custid); #lsc_aaa_customer
+                                SET $lsc_po_status= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=368 AND entity_id=$custid); #lsc_po_status
+                                SET $lsc_po_number= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=367 AND entity_id=$custid); #lsc_po_number
+                                SET $lsc_on_hold= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=369 AND entity_id=$custid); #lsc_on_hold
+                                SET $price_level= (SELECT `value` FROM `customer_entity_varchar` WHERE attribute_id=366 AND entity_id=$custid); #price_level
+
+
+                INSERT INTO 
+                temp_ByCustomer  (SELECT    $custid , $Fname,    $Lname,    $email,$grp,    $gpid,    $salesperson,
+                    $lsc_business_type,    $lsc_aaa_customer,    $lsc_po_status, $lsc_po_number , $lsc_on_hold , $price_level);
+                
+
+  END LOOP;
+CLOSE curcust;
+
+SELECT * FROM temp_ByCustomer;
+
+
+END$$
+
+
+DELIMITER ;
+
+
+Regards
+Satish
+

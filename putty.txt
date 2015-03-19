@@ -1,0 +1,66 @@
+Mysql restore database
+ 
+
+mysql -uroot -psomepassword dev_corp_gear < databasebackup.sql
+
+
+Get diffrence of magento corehacks
+
+diff -qrbB default_sacred_core_folder clients_core_folder
+
+
+Move all files from current direcory to upper directory(useful when unzipped and tar)
+
+mv * .[^.]* ..
+
+=========================================================
+searches string in current folder and returns file names
+find . -iname '*php' | xargs grep 'debug.log' -sl  
+
+
+
+grep --include=\*.{c,h} -rnw '/var/www/html/shop'  -e "searchstring"
+
+================================================================
+
+To search a text and save the result in a file
+
+cat abc.log | grep findthis > appendtothisfile.txt
+
+==================================================
+
+TAR: Creating and Extracting .tar.gz and .tar files
+tar -zxvf file.tar.gz : Extracts the file
+=================================
+
+
+tar -cvzf design.tar.gz design   //tars design folder as design.tar.gz
+
+tar -zxvf design.tar.gz design // untar design
+
+
+
+For Magento PHP modules
+
+
+
+
+
+yum install php
+
+yum install php-soap php-mcrypt php-pdo php-xml php-cli php-devel php-mbstring php-mysql php-xmlrpc php-mssql php-pear php-common php-gd
+ 
+ ===================================
+ Mcrypt installation
+ =================================
+ php-mcrypt is not in CentOS's standard repositories.  However, it is in Fedora's EPEL repository.
+
+Install the EPEL Repo:
+for 32 bit:
+rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+for 64 bit:
+rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+
+Then you can
+yum install php-mcrypt
+===================================
