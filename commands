@@ -1,0 +1,8 @@
+//For datbase connection
+database.sh
+//For restoring dump
+ restore_dump.sh luzerntech_22_Mar_2017.sql luzerntech_22_Mar_2017
+
+
+update core_config_data set value = 'http://domainname/' where path = 'web/unsecure/base_url';
+update core_config_data set value = 'http://domainname/' where path = 'web/secure/base_url';
